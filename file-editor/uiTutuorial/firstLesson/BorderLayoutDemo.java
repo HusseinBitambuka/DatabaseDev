@@ -1,4 +1,4 @@
-package ui.firstLesson;
+package uiTutuorial.firstLesson;
 
 import javax.swing.*;
 import java.awt.*;
