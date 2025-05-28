@@ -1,28 +1,14 @@
 package BillionRow.data;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Challenge1 {
-    static class Stats {
-        int count = 0;
-        double sum = 0, min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+import BillionRow.data.Challenge1.Stats;
 
-        void add(double val) {
-            sum += val;
-            count++;
-            min = Math.min(min, val);
-            max = Math.max(max, val);
-        }
-
-        double avg() {
-            return sum / count;
-        }
-
-        public String toString() {
-            return String.format("%.1f/%.1f/%.1f", min, avg(), max);
-        }
-    }
+public class ChallengeWithCustomStringParsing {
 
     public static void main(String[] args) throws IOException {
         long startTime = System.currentTimeMillis() / 1000;
@@ -34,9 +20,9 @@ public class Challenge1 {
             String line;
             while ((line = reader.readLine()) != null) {
                 numRow++;
-                String[] parts = line.split(";");
-                String station = parts[0];
-                double temp = Double.parseDouble(parts[1]);
+                int lineSep = line.indexOf(";");
+                String station = line.substring(0, lineSep);
+                Double temp = Double.parseDouble(line.substring(lineSep + 1));
                 data.computeIfAbsent(station, k -> new Stats()).add(temp);
             }
         }
@@ -53,7 +39,8 @@ public class Challenge1 {
 
 }
 
-/*
+/**
+ * output
  * Abha=-30.3/18.0/66.8
  * Abidjan=-28.1/26.0/75.9
  * Abéché=-21.5/29.4/77.0
@@ -468,5 +455,6 @@ public class Challenge1 {
  * Ürümqi=-44.6/7.4/56.4
  * İzmir=-29.0/17.9/69.1
  * 
- * the challenge contain 1000000000 rows parsed and processed in 232 seconds
+ * 
+ * the challenge contain 1000000000 rows parsed and processed in 176 seconds
  */
