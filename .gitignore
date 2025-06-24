@@ -29,3 +29,5 @@ BillionRow/data/measurements.txt
 
 # Ignore Gradle build output directory
 build
+#ignore VS code configureation
+.vscode

@@ -10,6 +10,9 @@ plugins {
     id 'application'
 }
 
+group = 'com.hussein'
+version = '1.0'
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
@@ -32,5 +35,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'org.example.App'
+    mainClass = 'App'
 }

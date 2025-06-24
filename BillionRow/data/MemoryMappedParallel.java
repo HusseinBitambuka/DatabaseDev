@@ -14,7 +14,6 @@ public class MemoryMappedParallel {
     public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
         File file = new File("/home/husseinbitambuka/Dev/DatabaseDev/BillionRow/data/measurements.txt");
         long fileSize = file.length();
-        System.out.println("the number of threads in your machine is: " + THREAD_COUNT);
 
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_COUNT);
         List<Future<ParseResult>> futures = new ArrayList<>();
@@ -33,8 +32,10 @@ public class MemoryMappedParallel {
 
         Map<String, Stats> finalMap = new HashMap<>();
 
+        int threadNum = 1;
         for (Future<ParseResult> future : futures) {
             ParseResult result = future.get();
+            System.out.println("Thread " + threadNum++ + ": parsed " + result.rows + " rows");
             totalRows += result.rows;
             for (Map.Entry<String, Stats> entry : result.data.entrySet()) {
                 finalMap.computeIfAbsent(entry.getKey(), k -> new Stats()).merge(entry.getValue());
@@ -48,7 +49,7 @@ public class MemoryMappedParallel {
                 .forEach(e -> System.out.println(e.getKey() + "=" + e.getValue()));
 
         long endTime = System.currentTimeMillis();
-        System.out.println("Parsed:  " + totalRows + " rows in " + ((endTime - startTime) / 1000) + " seconds.");
+        System.out.println("Parsed " + totalRows + " rows in " + ((endTime - startTime) / 1000) + " seconds.");
     }
 
     private static ParseResult processChunk(File file, long start, long end, boolean isFirstChunk) throws IOException {
@@ -62,8 +63,12 @@ public class MemoryMappedParallel {
             byte[] lineBuffer = new byte[256];
             int pos = 0;
 
-            if (!isFirstChunk) {
-                while (buffer.hasRemaining() && buffer.get() != '\n') {
+            if (!isFirstChunk && buffer.hasRemaining()) {
+                byte b = buffer.get();
+                if (b != '\n') {
+                    while (buffer.hasRemaining() && b != '\n') {
+                        b = buffer.get();
+                    }
                 }
             }
 
@@ -94,7 +99,7 @@ public class MemoryMappedParallel {
                 }
             }
 
-            // Final line
+            // Final line (if no trailing newline)
             if (pos > 0) {
                 String line = new String(lineBuffer, 0, pos, StandardCharsets.UTF_8);
                 int sep = line.indexOf(';');
@@ -114,7 +119,7 @@ public class MemoryMappedParallel {
     }
 }
 
-// Helper class to return both stats and row count
+// Used to return both parsed rows and stats map from each thread
 class ParseResult {
     Map<String, Stats> data;
     int rows;
